@@ -13,7 +13,7 @@ class NetworkRequest {
     
     private init() {}
     
-    let apiKey = "9b889c9e"
+    let apiKey = "********"
     
     func requestData(searchName: String, completion: @escaping (Result<Data, Error>) -> Void) {
         
