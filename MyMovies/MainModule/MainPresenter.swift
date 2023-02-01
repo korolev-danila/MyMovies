@@ -9,12 +9,12 @@ import Foundation
 import UIKit
 import CoreData
 
-protocol MainViewProtocol: class {
+protocol MainViewProtocol: AnyObject {
 
     func settingNC()
 }
 
-protocol MainPresenterProtocol: class {
+protocol MainPresenterProtocol: AnyObject {
     
     init(view: MainViewProtocol, router: RouterProtocol, navigationController: UINavigationController, context: NSManagedObjectContext)
     
@@ -57,10 +57,8 @@ class MainPresenter: MainPresenterProtocol {
     // MARK: - DeleteMovie
     func delete(film: MyMovie) {
         print("delete")
-        do {
-            try context.delete(film)
-        } catch let error as NSError {
-            print(error.localizedDescription)
-        }
+        
+        context.delete(film)
+        
     }
 }

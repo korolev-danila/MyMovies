@@ -24,7 +24,7 @@ class SearchTableVC: UIViewController {
     
     
     func settingTableView() {
-        let barHeight: CGFloat = UIApplication.shared.statusBarFrame.size.height
+        let barHeight: CGFloat = view.window?.windowScene?.statusBarManager?.statusBarFrame.height ?? 0
         let displayWidth: CGFloat = self.view.frame.width
         let displayHeight: CGFloat = self.view.frame.height
         
@@ -103,8 +103,8 @@ extension SearchTableVC: UISearchBarDelegate {
         if text != "" {
             presenter.timer.invalidate()
             presenter.timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false, block: { [weak self] _ in
-                var filmName = text!.replacingOccurrences(of: " ", with: "%20")
-                self?.presenter.searchFilm(filmName: filmName ) // "harry%20potter"
+                let filmName = text!.replacingOccurrences(of: " ", with: "%20")
+                self?.presenter.searchFilm(filmName: "harry%20potter" ) // "harry%20potter" filmName
             })
         }
     }

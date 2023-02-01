@@ -7,7 +7,7 @@
 
 import UIKit
 
-protocol CollectionViewCellDelegate: class {
+protocol CollectionViewCellDelegate: AnyObject {
     func delete(cell: CollectionViewCell)
 }
 

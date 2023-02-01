@@ -9,11 +9,11 @@ import Foundation
 import UIKit
 import CoreData
 
-protocol DetailViewProtocol: class {
+protocol DetailViewProtocol: AnyObject {
     func setFilm(film: MyMovie)
 }
 
-protocol DetailViewPresenterProtocol: class {
+protocol DetailViewPresenterProtocol: AnyObject {
     init(view: DetailViewProtocol,router: RouterProtocol, navigationController: UINavigationController, film: MyMovie,  context: NSManagedObjectContext)
     var film: MyMovie { get set }
     func tapSave()

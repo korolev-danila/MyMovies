@@ -9,12 +9,12 @@ import Foundation
 import UIKit
 import CoreData
 
-protocol SearchViewProtocol: class {
+protocol SearchViewProtocol: AnyObject {
     func alertOk(title: String, message: String)
     var myTableView: UITableView { get set }
 }
 
-protocol SearchPresenterProtocol: class {
+protocol SearchPresenterProtocol: AnyObject {
     init(view: SearchViewProtocol, router: RouterProtocol, navigationController: UINavigationController, context: NSManagedObjectContext)
     
     var films: [Film] { get set }
@@ -42,9 +42,9 @@ class SearchPresenter: SearchPresenterProtocol {
     }
     
     func searchFilm(filmName: String) {
-        
+        print("1")
         NetworkDataFetch.shared.fetchMovie(searchName: filmName) { [weak self] movieModel, error in
-            
+            print("11")
             if error == nil {
                 self?.movies = movieModel!.Search
                 self?.films.removeAll()
@@ -58,6 +58,7 @@ class SearchPresenter: SearchPresenterProtocol {
                     
                     self?.films.append(film)
                 })
+                print("12")
                 self?.view?.myTableView.reloadData()
             } else {
                 self?.view?.alertOk(title: "Error", message: "Film not found")
