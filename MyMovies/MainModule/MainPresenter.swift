@@ -6,59 +6,83 @@
 //
 
 import Foundation
-import UIKit
 import CoreData
 
 protocol MainViewProtocol: AnyObject {
-
-    func settingNC()
+    func reloadData()
 }
 
 protocol MainPresenterProtocol: AnyObject {
-    
-    init(view: MainViewProtocol, router: RouterProtocol, navigationController: UINavigationController, context: NSManagedObjectContext)
-    
     func showSearch()
-    func showDetail(film: MyMovie)
-    func delete(film: MyMovie)
+    func showDetail(index: IndexPath)
+    func delete(index: IndexPath)
     
-    var context: NSManagedObjectContext { get set }
-    var myMyvies: [MyMovie] { get set }
-    var router: RouterProtocol? { get set }
-    var navigationController: UINavigationController? { get set }
-    
+    func fetchMovies()
+    func getCountMovies() -> Int
+    func getCellModel(index: IndexPath) -> CellModel
 }
 
-class MainPresenter: MainPresenterProtocol {
-    
-    var context: NSManagedObjectContext
-    var myMyvies: [MyMovie] = []
-    
+struct CellModel {
+    let name: String
+    var imageData: Data?
+}
+
+final class MainPresenter {
     weak var view: MainViewProtocol?
-    var router: RouterProtocol?
-    var navigationController: UINavigationController? 
+    private let router: RouterProtocol
+    private let context: NSManagedObjectContext
     
-    required init(view: MainViewProtocol, router: RouterProtocol, navigationController: UINavigationController, context: NSManagedObjectContext) {
-        self.view = view
+    private var myMovies: [MyMovie] = []
+    
+    // MARK: - Initialize Method
+    init(router: RouterProtocol, context: NSManagedObjectContext) {
         self.router = router
-        self.navigationController = navigationController
         self.context = context
     }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+}
 
-    @objc func showSearch() {
-        router?.showSearchModul()
-        print("presente != nil in presenter")
+// MARK: - MainPresenterProtocol
+extension MainPresenter: MainPresenterProtocol {
+    func showSearch() {
+        router.showSearchModul()
     }
     
-    func showDetail(film: MyMovie) {
-        router?.showDetailModul(film: film)
+    func showDetail(index: IndexPath) {
+        if let movie = myMovies[safe: index.row] {
+            router.showDetailModul(film: movie)
+        }
     }
     
-    // MARK: - DeleteMovie
-    func delete(film: MyMovie) {
-        print("delete")
+    func delete(index: IndexPath) {
+        if let movie = myMovies[safe: index.row] {
+            context.delete(movie)
+        }
+    }
+    
+    func getCountMovies() -> Int {
+        return myMovies.count
+    }
+    
+    func getCellModel(index: IndexPath) -> CellModel {
+        let movie = myMovies[safe: index.row]
+        var model = CellModel(name: movie?.name ?? "")
+        model.imageData = movie?.imageData
+        return model
+    }
+    
+    func fetchMovies() {
+        let fetchRequest: NSFetchRequest<MyMovie> = MyMovie.fetchRequest()
         
-        context.delete(film)
-        
+        do {
+            myMovies = try context.fetch(fetchRequest)
+            print("presenter.myMovies reloaddata")
+            view?.reloadData()
+        } catch let error as NSError {
+            print(error.localizedDescription)
+        }
     }
 }

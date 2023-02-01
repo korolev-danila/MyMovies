@@ -6,139 +6,132 @@
 //
 
 import UIKit
-import CoreData
 
-class MainViewController: UIViewController {
+final class MainViewController: UIViewController {
+    private let presenter: MainPresenterProtocol
     
-    var myCollectionView:UICollectionView?
+    private var didSelectItemAtIsEnabled = true
     
-    var presenter: MainPresenterProtocol!
+    private var myCollectionView: UICollectionView = {
+        let collection = UICollectionView()
+        collection.register(CollectionViewCell.self, forCellWithReuseIdentifier: "MyCell")
+        collection.backgroundColor = .black
+        return collection
+    }()
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        let fetchRequest: NSFetchRequest<MyMovie> = MyMovie.fetchRequest()
-        
-        do {
-            presenter.myMyvies = try presenter.context.fetch(fetchRequest)
-            print("presenter.myMovies reloaddata")
-            myCollectionView?.reloadData()
-            
-        } catch let error as NSError {
-            print(error.localizedDescription)
-        }
+    // MARK: - Initialize Method
+    init(presenter: MainPresenterProtocol) {
+        self.presenter = presenter
+        super.init(nibName: nil, bundle: nil)
     }
     
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        
-        self.view.backgroundColor = .black
+        setupView()
+        presenter.fetchMovies()
+    }
+    
+    // MARK: - Private Method
+    private func setupView() {
+        view.backgroundColor = .black
         
         let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
         layout.sectionInset = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
         layout.itemSize = CGSize(width: 90, height: 130)
         
-        myCollectionView = UICollectionView(frame: self.view.frame, collectionViewLayout: layout)
+        myCollectionView.frame = view.frame
+        myCollectionView.setCollectionViewLayout(layout, animated: false)
         
-        myCollectionView?.register(CollectionViewCell.self, forCellWithReuseIdentifier: "MyCell")
-        myCollectionView?.backgroundColor = .black
-        
-        myCollectionView?.delegate = self
-        myCollectionView?.dataSource = self
-        
-        
-        view.addSubview(myCollectionView ?? UICollectionView())
-        
+        myCollectionView.delegate = self
+        myCollectionView.dataSource = self
+        view.addSubview(myCollectionView)
         settingNC()
     }
     
-    // MARK: - settingNC
-    
-    func settingNC() {
-        print("settingNC")
-        self.navigationController?.navigationBar.backgroundColor = .blue
+    private func settingNC() {
+        navigationController?.navigationBar.backgroundColor = .blue
+        
         let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(setAdd))
-        let editButton = UIBarButtonItem(barButtonSystemItem: .edit, target: self, action: #selector(setEdit))
         addButton.tintColor = .white
+        navigationController?.navigationBar.topItem?.setRightBarButton(addButton, animated: true)
+        
+        let editButton = UIBarButtonItem(barButtonSystemItem: .edit, target: self, action: #selector(setEdit))
         editButton.tintColor = .white
-        self.navigationController?.navigationBar.topItem?.setRightBarButton(addButton, animated: true)
-        self.navigationController?.navigationBar.topItem?.setLeftBarButton(editButton, animated: true)
+        navigationController?.navigationBar.topItem?.setLeftBarButton(editButton, animated: true)
     }
     
+    private func changeCellButton(isHidden: Bool) {
+        didSelectItemAtIsEnabled = isHidden
+        let indexPaths = myCollectionView.indexPathsForVisibleItems
+        for indexPath in indexPaths {
+            if let cell = myCollectionView.cellForItem(at: indexPath) as? CollectionViewCell {
+                cell.isEditingClose = isHidden
+            }
+        }
+    }
+    
+    // MARK: - Action
     @objc func setAdd() {
         self.presenter.showSearch()
     }
-    
     
     @objc func setDone() {
         settingNC()
         changeCellButton(isHidden: true)
     }
     
-    // MARK: - Delete Items
-    var didSelectItemAtIsEnabled: Bool = true
-    
     @objc func setEdit() {
-        print("setEdit")
         let doneButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(setDone))
+        doneButton.tintColor = .white
+        navigationItem.setLeftBarButton(doneButton, animated: true)
+        
         let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(setAdd))
         addButton.isEnabled = false
-        doneButton.tintColor = .white
-        self.navigationItem.setRightBarButton(addButton, animated: true)
-        self.navigationItem.setLeftBarButton(doneButton, animated: true)
-        changeCellButton(isHidden: false)
+        navigationItem.setRightBarButton(addButton, animated: true)
         
-    }
-    
-    private func changeCellButton(isHidden: Bool) {
-        didSelectItemAtIsEnabled = isHidden
-        if let indexPaths = myCollectionView?.indexPathsForVisibleItems {
-            for indexPath in indexPaths {
-                if let cell = myCollectionView?.cellForItem(at: indexPath) as? CollectionViewCell {
-                    cell.isEditingClose = isHidden
-                    
-                }
-            }
-        }
+        changeCellButton(isHidden: false)
     }
 }
 
 // MARK: - Collection DataSource
 extension MainViewController: UICollectionViewDataSource, UICollectionViewDelegate {
-    
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if didSelectItemAtIsEnabled {
-            presenter.showDetail(film: presenter.myMyvies[indexPath.row])
+            presenter.showDetail(index: indexPath)
         }
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return presenter.myMyvies.count
+        return presenter.getCountMovies()
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let myCell = collectionView.dequeueReusableCell(withReuseIdentifier: "MyCell", for: indexPath) as! CollectionViewCell
-        myCell.setupViews()
-        myCell.configureMovieCell(movie: presenter.myMyvies[indexPath.row])
+        myCell.configureMovieCell(cellModel: presenter.getCellModel(index: indexPath))
         myCell.delegate = self
         return myCell
     }
 }
 
+// MARK: - CollectionViewCellDelegate
 extension MainViewController: CollectionViewCellDelegate {
     func delete(cell: CollectionViewCell) {
-        if let indexPath = myCollectionView?.indexPath(for: cell) {
-            let myMovie = presenter.myMyvies[indexPath.item]
-            presenter.myMyvies.remove(at: indexPath.item)
-            presenter.delete(film: myMovie)
-            
-            myCollectionView?.deleteItems(at: [indexPath])
+        if let indexPath = myCollectionView.indexPath(for: cell) {
+            presenter.delete(index: indexPath)
+            myCollectionView.deleteItems(at: [indexPath])
+            presenter.fetchMovies()
         }
     }
 }
 
+// MARK: - MainViewProtocol
 extension MainViewController: MainViewProtocol {
-    
+    func reloadData() {
+        myCollectionView.reloadData()
+    }
 }

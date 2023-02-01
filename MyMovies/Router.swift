@@ -5,58 +5,57 @@
 //  Created by Данила on 14.05.2022.
 //
 
-import Foundation
 import UIKit
 import CoreData
 
-protocol RouterMain {
-    var navigationController: UINavigationController? { get set }
-    var modulBuilder: ModulBuilderProtocol? { get set }
-    var context: NSManagedObjectContext { get set }
-}
+//protocol RouterMain {
+//    var navigationController: UINavigationController { get set }
+//    var modulBuilder: ModulBuilderProtocol { get set }
+//    var context: NSManagedObjectContext { get set }
+//}
 
-protocol RouterProtocol: RouterMain {
+protocol RouterProtocol {
     func showMainModul()
     func showSearchModul()
     func showDetailModul(film: MyMovie)
     func popToRoot()
 }
 
-class Router: RouterProtocol {
-    
-    var navigationController: UINavigationController?
-    var modulBuilder: ModulBuilderProtocol?
-    var context: NSManagedObjectContext
+final class Router {
+    private let navigationController: UINavigationController
+    private let modulBuilder: ModulBuilderProtocol
+    private let context: NSManagedObjectContext
     
     init(navigationController: UINavigationController, modulBuilder: ModulBuilderProtocol, context: NSManagedObjectContext) {
         self.navigationController = navigationController
         self.modulBuilder = modulBuilder
         self.context = context
     }
-    
-    func showMainModul() {
-        if let navigationController = navigationController {
-            guard let mainViewController =  modulBuilder?.createMainModule(router: self, navigationController: navigationController, context: context) else { return }
-            navigationController.viewControllers = [mainViewController]
-        }
-    }
-    
-    func showSearchModul() {
-        if let navigationController = navigationController {
+}
 
-            guard let searchVC = modulBuilder?.createSearchModule(router: self, navigationController: navigationController, context: context) else { return  }
-            navigationController.pushViewController(searchVC, animated: true)
-        }
+extension Router: RouterProtocol {
+    
+    public func showMainModul() {
+        let mainViewController =  modulBuilder.createMainModule(router: self,
+                                                                context: context)
+        navigationController.viewControllers = [mainViewController]
     }
     
-    func showDetailModul(film: MyMovie) {
-        if let navigationController = navigationController {
-            guard let detailViewController =  modulBuilder?.createDetailModule(router: self, navigationController: navigationController, film: film, context: context) else { return }
-            navigationController.pushViewController(detailViewController, animated: true)
-        }
+    public func showSearchModul() {
+        let searchVC = modulBuilder.createSearchModule(router: self,
+                                                       navigationController: navigationController,
+                                                       context: context)
+        navigationController.pushViewController(searchVC, animated: true)
     }
     
-    func popToRoot() {        
-        self.navigationController?.popToRootViewController(animated: true)
+    public func showDetailModul(film: MyMovie) {
+        let detailViewController =  modulBuilder.createDetailModule(router: self,
+                                                                     navigationController: navigationController,
+                                                                     film: film, context: context)
+        navigationController.pushViewController(detailViewController, animated: true)
+    }
+    
+    public func popToRoot() {
+        navigationController.popToRootViewController(animated: true)
     }
 }

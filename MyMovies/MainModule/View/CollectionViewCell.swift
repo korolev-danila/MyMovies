@@ -15,6 +15,14 @@ class CollectionViewCell: UICollectionViewCell {
     
     weak var delegate: CollectionViewCellDelegate?
     
+    var isEditingClose: Bool = true {
+        didSet {
+            closeBlure.isHidden = isEditingClose
+            closeButton.isHidden = isEditingClose
+            closeButton.isEnabled = !isEditingClose
+        }
+    }
+    
     private let filmLogo: UIImageView = {
         let imageView = UIImageView()
         imageView.backgroundColor = .green
@@ -31,14 +39,13 @@ class CollectionViewCell: UICollectionViewCell {
         label.textColor = .white
         label.adjustsFontSizeToFitWidth = false
         label.numberOfLines = 2
-        //  label.minimumScaleFactor = 0.5
         label.baselineAdjustment = .alignBaselines
         label.textAlignment  = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
-     let closeBlure: UIVisualEffectView = {
+    private let closeBlure: UIVisualEffectView = {
         let effect = UIVisualEffectView(effect: UIBlurEffect(style: .light))
         effect.clipsToBounds = true
         effect.layer.cornerRadius = 25
@@ -46,7 +53,7 @@ class CollectionViewCell: UICollectionViewCell {
         return effect
     }()
     
-     let closeButton: UIButton = {
+    private let closeButton: UIButton = {
         let button = UIButton()
         button.setImage(UIImage(systemName: "xmark.circle"), for: .normal )
         button.tintColor = .white
@@ -54,46 +61,31 @@ class CollectionViewCell: UICollectionViewCell {
         return button
     }()
     
-    var isEditingClose: Bool = true {
-        didSet {
-            closeBlure.isHidden = isEditingClose
-            closeButton.isHidden = isEditingClose
-            closeButton.isEnabled = !isEditingClose
-        }
-    }
-    
-    
-    func setupViews() {
-        self.backgroundColor = .clear
-        
-        self.addSubview(filmLogo)
-        self.addSubview(filmNameLabel)
-        self.addSubview(closeBlure)
-        self.addSubview(closeButton)
-        isEditingClose = true
-
-        closeButton.addTarget(.none, action: #selector(deletButtonTap), for: .touchDown)
-        
+    // MARK: - Init
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        setupViews()
         setConstraints()
     }
-  
-    // MARK: - DeleteButtomTap
-    @objc func deletButtonTap() {
-        delegate?.delete(cell: self)
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
-
-    func configureMovieCell(movie: MyMovie) {
-        if movie.imageData != nil {
-            filmLogo.image = UIImage(data: movie.imageData!)
-        } else {
-            filmLogo.image = nil
-        }
-        filmNameLabel.text = movie.name
+    // MARK: - Private Method
+    private func setupViews() {
+        contentView.backgroundColor = .clear
+        
+        contentView.addSubview(filmLogo)
+        contentView.addSubview(filmNameLabel)
+        contentView.addSubview(closeBlure)
+        contentView.addSubview(closeButton)
+        
+        isEditingClose = true
+        closeButton.addTarget(.none, action: #selector(deletButtonTap), for: .touchDown)
     }
     
     private func setConstraints() {
-        
         NSLayoutConstraint.activate([
             filmLogo.topAnchor.constraint(equalTo: self.topAnchor),
             filmLogo.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -30),
@@ -120,5 +112,22 @@ class CollectionViewCell: UICollectionViewCell {
             closeButton.widthAnchor.constraint(equalToConstant: 25),
             closeButton.heightAnchor.constraint(equalToConstant: 25)
         ])
+    }
+    
+    // MARK: - DeleteButtomTap
+    @objc func deletButtonTap() {
+        delegate?.delete(cell: self)
+    }
+    
+    // MARK: - Public method 
+    public func configureMovieCell(cellModel: CellModel) {
+        
+        if let data = cellModel.imageData{
+            filmLogo.image = UIImage(data: data)
+        } else {
+            filmLogo.image = nil
+        }
+        
+        filmNameLabel.text = cellModel.name
     }
 }
