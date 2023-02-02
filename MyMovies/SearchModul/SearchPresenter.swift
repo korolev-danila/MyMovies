@@ -6,39 +6,35 @@
 //
 
 import Foundation
-import UIKit
 import CoreData
 
 protocol SearchViewProtocol: AnyObject {
     func alertOk(title: String, message: String)
-    var myTableView: UITableView { get set }
 }
 
 protocol SearchPresenterProtocol: AnyObject {
-    init(view: SearchViewProtocol, router: RouterProtocol, navigationController: UINavigationController, context: NSManagedObjectContext)
-    
-    var films: [Film] { get set }
-    var timer: Timer { get set }
-    var movies: [Movie] { get set }
     func searchFilm(filmName: String)
     func showDetail(index: Int) 
 }
 
 class SearchPresenter: SearchPresenterProtocol {
-    
+    weak var view: SearchViewProtocol?
+    private let router: RouterProtocol
+    private let context: NSManagedObjectContext
     var films = [Film]()
     var movies = [Movie]()
     var timer = Timer()
-    weak var view: SearchViewProtocol?
-    var router: RouterProtocol?
-    var navigationController: UINavigationController?
-    var context: NSManagedObjectContext!
     
-    required init(view: SearchViewProtocol, router: RouterProtocol, navigationController: UINavigationController, context: NSManagedObjectContext) {
-        self.view = view
+    
+    
+    // MARK: - Initialize Method
+    init(router: RouterProtocol, context: NSManagedObjectContext) {
         self.router = router
-        self.navigationController = navigationController
         self.context = context
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     func searchFilm(filmName: String) {
@@ -59,7 +55,7 @@ class SearchPresenter: SearchPresenterProtocol {
                     self?.films.append(film)
                 })
                 print("12")
-                self?.view?.myTableView.reloadData()
+      //          self?.view?.myTableView.reloadData()
             } else {
                 self?.view?.alertOk(title: "Error", message: "Film not found")
             }
@@ -79,7 +75,7 @@ class SearchPresenter: SearchPresenterProtocol {
         filmObject.watched = films[index].watched
         filmObject.comment = films[index].comment
         
-        router?.showDetailModul(film: filmObject)
+        router.showDetailModul(film: filmObject)
     }
 }
 

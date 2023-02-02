@@ -8,10 +8,6 @@
 import Foundation
 import CoreData
 
-protocol MainViewProtocol: AnyObject {
-    func reloadData()
-}
-
 protocol MainPresenterProtocol: AnyObject {
     func showSearch()
     func showDetail(index: IndexPath)

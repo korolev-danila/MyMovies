@@ -7,6 +7,10 @@
 
 import UIKit
 
+protocol MainViewProtocol: AnyObject {
+    func reloadData()
+}
+
 final class MainViewController: UIViewController {
     private let presenter: MainPresenterProtocol
     
