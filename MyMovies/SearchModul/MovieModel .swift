@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-struct MovieModel: Decodable, Equatable {
+struct MoviesModel: Decodable, Equatable {
     var Search: [Movie]
 }
 

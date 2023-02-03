@@ -7,26 +7,42 @@
 
 import UIKit
 
-class SearchTableVC: UIViewController {
+protocol SearchViewProtocol: AnyObject {
+    func alertOk(title: String, message: String)
+    func reloadTable()
+}
+
+final class SearchTableVC: UIViewController {
+    private let presenter: SearchPresenterProtocol
     
-    var presenter:  SearchPresenterProtocol!
+    private var myTableView = UITableView()
+    private var timer = Timer()
+
     
-    var myTableView = UITableView()
+    // MARK: - Initialize Method
+    init(presenter: SearchPresenterProtocol) {
+        self.presenter = presenter
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.view.backgroundColor = .black
+        view.backgroundColor = .black
         
         settingTableView()
         settingNC()
     }
     
-    
-    func settingTableView() {
+    // MARK: - Private method
+    private func settingTableView() {
         let barHeight: CGFloat = view.window?.windowScene?.statusBarManager?.statusBarFrame.height ?? 0
-        let displayWidth: CGFloat = self.view.frame.width
-        let displayHeight: CGFloat = self.view.frame.height
+        let displayWidth: CGFloat = view.frame.width
+        let displayHeight: CGFloat = view.frame.height
         
         myTableView = UITableView(frame: CGRect(x: 0, y: barHeight, width: displayWidth, height: displayHeight - barHeight))
         myTableView.register(TableViewCell.self, forCellReuseIdentifier: "MyCell")
@@ -35,61 +51,35 @@ class SearchTableVC: UIViewController {
         myTableView.rowHeight = 144.0
         myTableView.backgroundColor = .black
         
-        self.view.addSubview(myTableView)
+        view.addSubview(myTableView)
     }
     
-    func settingNC() {
+    private func settingNC() {
         let searchController = UISearchController(searchResultsController: nil)
         searchController.obscuresBackgroundDuringPresentation = false
         searchController.searchBar.placeholder = "Search movies"
-        self.navigationItem.searchController = searchController
-        self.definesPresentationContext = true
-        self.navigationItem.hidesSearchBarWhenScrolling = false
+        navigationItem.searchController = searchController
+        definesPresentationContext = true
+        navigationItem.hidesSearchBarWhenScrolling = false
         searchController.searchBar.delegate = self
     }
-    
-    func alertOk(title: String, message: String) {
-        let alet = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        let ok = UIAlertAction(title: "OK", style: .default)
-        alet.addAction(ok)
-        present(alet, animated: true, completion: nil)
-    }
-    
 }
 
 // MARK: - TableVC Delegate
 extension SearchTableVC: UITableViewDelegate, UITableViewDataSource {
-    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         print("Num: \(indexPath.row)")
-        print(self.presenter.films)
-        presenter.showDetail(index: indexPath.row)
+        presenter.showDetail(index: indexPath)
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return presenter.films.count
+        return presenter.getCountOfMovie()
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "MyCell", for: indexPath as IndexPath) as! TableViewCell
-        let film = presenter.films[indexPath.row]
-        
-        let urlString = film.imageStr
-        
-        NetworkRequest.shared.requestDataPoster(urlString: urlString) {[weak self] result in
-            switch result {
-            case .success(let data):
-                self?.presenter.films[indexPath.row].imageData = data
-                cell.setImage(imageData: data)
-            case .failure(let error):
-                let filmLogo = UIImage(named: "filmLogo")?.pngData()
-                self?.presenter.films[indexPath.row].imageData = filmLogo
-                cell.setImage(imageData: filmLogo!)
-                print("No film logo" + error.localizedDescription)
-            }
-        }
-        
-        cell.configureFilmCell(film: film)
+        let model = presenter.getTableModel(index: indexPath)
+        cell.configureFilmCell(model)
         return cell
     }
 }
@@ -101,15 +91,25 @@ extension SearchTableVC: UISearchBarDelegate {
         let text = searchText.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)
         
         if text != "" {
-            presenter.timer.invalidate()
-            presenter.timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false, block: { [weak self] _ in
+            timer.invalidate()
+            timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false, block: { [weak self] _ in
                 let filmName = text!.replacingOccurrences(of: " ", with: "%20")
-                self?.presenter.searchFilm(filmName: "harry%20potter" ) // "harry%20potter" filmName
+                self?.presenter.searchFilm(filmName) // "harry%20potter"
             })
         }
     }
 }
 
+// MARK: - SearchViewProtocol
 extension SearchTableVC: SearchViewProtocol {
+    func alertOk(title: String, message: String) {
+        let alet = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let ok = UIAlertAction(title: "OK", style: .default)
+        alet.addAction(ok)
+        present(alet, animated: true, completion: nil)
+    }
     
+    func reloadTable() {
+        myTableView.reloadData()
+    }
 }

@@ -7,7 +7,7 @@
 
 import UIKit
 
-class TableViewCell: UITableViewCell {
+final class TableViewCell: UITableViewCell {
 
     private let filmLogo: UIImageView = {
         let imageView = UIImageView()
@@ -44,35 +44,21 @@ class TableViewCell: UITableViewCell {
         
         setupViews()
         setConstraints()
-        
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
+    // MARK: - Private method
     private func setupViews() {
-        self.backgroundColor = .clear
-        self.selectionStyle = .none
+        backgroundColor = .clear
+        selectionStyle = .none
         
-        self.addSubview(filmLogo)
-        self.addSubview(filmNameLabel)
-        self.addSubview(yearsLabel)
+        contentView.addSubview(filmLogo)
+        contentView.addSubview(filmNameLabel)
+        contentView.addSubview(yearsLabel)
 
-    }
-    
-    func setImage(imageData: Data) {
-        if imageData != nil {
-            let image = UIImage(data: imageData)
-            filmLogo.image = image
-        } else {
-            filmLogo.image = nil
-        }
-    }
-    
-    func configureFilmCell(film: Film) {
-    filmNameLabel.text = film.name
-    yearsLabel.text = "\(film.year) year"
     }
     
     private func setConstraints() {
@@ -95,5 +81,15 @@ class TableViewCell: UITableViewCell {
             yearsLabel.leadingAnchor.constraint(equalTo: filmLogo.trailingAnchor, constant: 10),
             yearsLabel.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -10)
         ])
+    }
+    
+    // MARK: - Public method
+    func setImage(_ imageData: Data) {
+        filmLogo.image = UIImage(data: imageData)
+    }
+    
+    func configureFilmCell(_ model: TableCellModel) {
+        filmNameLabel.text = model.name
+        yearsLabel.text = model.year
     }
 }

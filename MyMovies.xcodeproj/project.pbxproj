@@ -156,6 +156,7 @@
 				839903552831172200538793 /* ModulBuilder.swift */,
 				839903562831172200538793 /* Router.swift */,
 				83B9604A298AD0FF007066CC /* Extension.swift */,
+				8399031D2831168300538793 /* MyMovies.xcdatamodeld */,
 				83990349283116E500538793 /* MainModule */,
 				8399034E283116FD00538793 /* SearchModul */,
 				839903652833AD7600538793 /* DetailModul */,
@@ -209,7 +210,6 @@
 				839903202831168600538793 /* Assets.xcassets */,
 				839903222831168600538793 /* LaunchScreen.storyboard */,
 				839903252831168600538793 /* Info.plist */,
-				8399031D2831168300538793 /* MyMovies.xcdatamodeld */,
 			);
 			path = SupportingFiles;
 			sourceTree = "<group>";

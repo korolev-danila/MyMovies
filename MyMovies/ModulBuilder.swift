@@ -30,9 +30,9 @@ extension ModulBuilder: ModulBuilderProtocol {
     }
     
     func createSearchModule(router: RouterProtocol, navigationController: UINavigationController, context: NSManagedObjectContext) -> UIViewController {
-        let view = SearchTableVC()
-        let presenter = SearchPresenter(view: view, router: router, navigationController: navigationController, context: context )
-        view.presenter = presenter
+        let presenter = SearchPresenter(router: router, context: context)
+        let view = SearchTableVC(presenter: presenter)
+        presenter.view = view
         return view
     }
     
