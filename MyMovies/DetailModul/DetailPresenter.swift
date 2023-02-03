@@ -5,52 +5,61 @@
 //  Created by Данила on 17.05.2022.
 //
 
-import Foundation
-import UIKit
 import CoreData
 
-protocol DetailViewProtocol: AnyObject {
-    func setFilm(film: MyMovie)
+protocol DetailPresenterProtocol: AnyObject {
+    func getMovie()
+    func tapSave(watched: Bool, comment: String, rating: Double)
 }
 
-protocol DetailViewPresenterProtocol: AnyObject {
-    init(view: DetailViewProtocol,router: RouterProtocol, navigationController: UINavigationController, film: MyMovie,  context: NSManagedObjectContext)
-    var film: MyMovie { get set }
-    func tapSave()
-    func saveFilm(film: MyMovie)
+struct ViewModel {
+    var watched: Bool
+    var name: String
+    var year: String
+    var rating: Double
+    var comment: String
+    var imageData: Data?
 }
 
-class DetailPresenter: DetailViewPresenterProtocol {
-    
+final class DetailPresenter {
     weak var view: DetailViewProtocol?
-    var router: RouterProtocol?
-    var navigationController: UINavigationController?
-    var film: MyMovie
-    var context: NSManagedObjectContext!
+    private let router: RouterProtocol
+    private let context: NSManagedObjectContext
     
-    required init(view: DetailViewProtocol, router: RouterProtocol, navigationController: UINavigationController, film: MyMovie,  context: NSManagedObjectContext) {
-        self.view = view
+    private var movie: MyMovie
+    
+    // MARK: - Initialize Method
+    init(router: RouterProtocol, context: NSManagedObjectContext, movie: MyMovie) {
         self.router = router
-        self.navigationController = navigationController
-        self.film = film
-        self.view?.setFilm( film: film)
         self.context = context
+        self.movie = movie
     }
     
-    func tapSave() {
-        saveFilm(film: film)
-        router?.popToRoot()
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+}
+
+// MARK: - DetailPresenterProtocol
+extension DetailPresenter: DetailPresenterProtocol {
+    func getMovie() {
+        let model = ViewModel(watched: movie.watched, name: movie.name ?? "",
+                              year: movie.year ?? "", rating: movie.rating,
+                              comment: movie.comment ?? "")
+        view?.setMovie(model)
     }
     
-    func saveFilm(film: MyMovie) {
-        
+    func tapSave(watched: Bool, comment: String, rating: Double) {
+        movie.watched = watched
+        movie.comment = comment
+        movie.rating = rating
         
         do {
             try context.save()
             print("save context")
-            
         } catch let error as NSError {
             print(error.localizedDescription)
         }
+        router.popToRoot()
     }
 }

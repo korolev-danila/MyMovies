@@ -48,7 +48,7 @@ extension MainPresenter: MainPresenterProtocol {
     
     func showDetail(index: IndexPath) {
         if let movie = myMovies[safe: index.row] {
-            router.showDetailModul(film: movie)
+            router.showDetailModul(movie: movie)
         }
     }
     

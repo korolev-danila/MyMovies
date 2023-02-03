@@ -78,7 +78,7 @@ extension SearchPresenter: SearchPresenterProtocol {
 //        filmObject.watched = films[index].watched
 //        filmObject.comment = films[index].comment
         
-        router.showDetailModul(film: filmObject)
+        router.showDetailModul(movie: filmObject)
     }
     
     func getCountOfMovie() -> Int {

@@ -8,16 +8,10 @@
 import UIKit
 import CoreData
 
-//protocol RouterMain {
-//    var navigationController: UINavigationController { get set }
-//    var modulBuilder: ModulBuilderProtocol { get set }
-//    var context: NSManagedObjectContext { get set }
-//}
-
 protocol RouterProtocol {
     func showMainModul()
     func showSearchModul()
-    func showDetailModul(film: MyMovie)
+    func showDetailModul(movie: MyMovie)
     func popToRoot()
 }
 
@@ -43,15 +37,12 @@ extension Router: RouterProtocol {
     
     public func showSearchModul() {
         let searchVC = modulBuilder.createSearchModule(router: self,
-                                                       navigationController: navigationController,
                                                        context: context)
         navigationController.pushViewController(searchVC, animated: true)
     }
     
-    public func showDetailModul(film: MyMovie) {
-        let detailViewController =  modulBuilder.createDetailModule(router: self,
-                                                                     navigationController: navigationController,
-                                                                     film: film, context: context)
+    public func showDetailModul(movie: MyMovie) {
+        let detailViewController =  modulBuilder.createDetailModule(router: self , movie: movie, context: context)
         navigationController.pushViewController(detailViewController, animated: true)
     }
     

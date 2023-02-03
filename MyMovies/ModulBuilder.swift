@@ -11,9 +11,9 @@ import CoreData
 protocol ModulBuilderProtocol {
     func createMainModule(router: RouterProtocol,
                           context: NSManagedObjectContext) -> UIViewController
-    func createSearchModule(router: RouterProtocol,  navigationController: UINavigationController,
+    func createSearchModule(router: RouterProtocol,
                             context: NSManagedObjectContext) -> UIViewController
-    func createDetailModule(router: RouterProtocol,  navigationController: UINavigationController, film: MyMovie,
+    func createDetailModule(router: RouterProtocol, movie: MyMovie,
                             context: NSManagedObjectContext) -> UIViewController
 }
 
@@ -21,7 +21,6 @@ final class ModulBuilder {}
 
 // MARK: - ModulBuilderProtocol
 extension ModulBuilder: ModulBuilderProtocol {
-    
     func createMainModule(router: RouterProtocol, context: NSManagedObjectContext) -> UIViewController {
         let presenter = MainPresenter(router: router, context: context)
         let view = MainViewController(presenter: presenter)
@@ -29,18 +28,18 @@ extension ModulBuilder: ModulBuilderProtocol {
         return view
     }
     
-    func createSearchModule(router: RouterProtocol, navigationController: UINavigationController, context: NSManagedObjectContext) -> UIViewController {
+    func createSearchModule(router: RouterProtocol, context: NSManagedObjectContext) -> UIViewController {
         let presenter = SearchPresenter(router: router, context: context)
         let view = SearchTableVC(presenter: presenter)
         presenter.view = view
         return view
     }
     
-    func createDetailModule(router: RouterProtocol,  navigationController: UINavigationController, film: MyMovie, context: NSManagedObjectContext) -> UIViewController {
-        let view = DetailViewController()
-        let presenter = DetailPresenter(view: view, router: router, navigationController: navigationController, film: film, context: context)
-        view.presenter = presenter
+    func createDetailModule(router: RouterProtocol, movie: MyMovie, context: NSManagedObjectContext) -> UIViewController {
+        let presenter = DetailPresenter(router: router, context: context, movie: movie)
+        let view = DetailViewController(presenter: presenter)
+        presenter.view = view
         return view
     }
-
+    
 }

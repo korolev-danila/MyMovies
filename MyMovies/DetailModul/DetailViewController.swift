@@ -8,9 +8,12 @@
 import UIKit
 import Cosmos
 
-class DetailViewController: UIViewController {
-    
-    var presenter: DetailViewPresenterProtocol!
+protocol DetailViewProtocol: AnyObject {
+    func setMovie(_ model: ViewModel)
+}
+
+final class DetailViewController: UIViewController {
+    private let presenter: DetailPresenterProtocol
     
     private let filmLogo: UIImageView = {
         let imageView = UIImageView()
@@ -70,7 +73,15 @@ class DetailViewController: UIViewController {
         return cosmosView
     }()
     
+    // MARK: - Initialize Method
+    init(presenter: DetailPresenterProtocol) {
+        self.presenter = presenter
+        super.init(nibName: nil, bundle: nil)
+    }
     
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -81,58 +92,21 @@ class DetailViewController: UIViewController {
         
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
-       // self.hideKeyboardWhenTappedAround()
+        // self.hideKeyboardWhenTappedAround()
         let tap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         view.addGestureRecognizer(tap)
+        
+        presenter.getMovie()
     }
     
-    // MARK: - Keyboard notification
-    @objc func keyboardWillShow(notification: NSNotification) {
-        if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
-            if self.view.frame.origin.y == 0 {
-                self.view.frame.origin.y -= keyboardSize.height
-            }
-        }
-    }
-    
-    @objc func keyboardWillHide(notification: NSNotification) {
-        if self.view.frame.origin.y != 0 {
-            self.view.frame.origin.y = 0
-        }
-    }
-    
-    @objc func dismissKeyboard() {
-        self.view.endEditing(true)
-    }
-    
-    // MARK: - settingSaveButton
-    func settingNC() {
+    // MARK: - Private method
+    private func settingNC() {
         let saveButton = UIBarButtonItem(title: "Save", style: .plain , target: self, action: #selector(saveButton))
         saveButton.tintColor = .white
         self.navigationItem.setRightBarButton(saveButton, animated: true)
     }
     
-    // MARK: - target
-    @objc func saveButton() {
-        print(watchedSwith.isOn)
-        self.presenter.film.watched = watchedSwith.isOn
-        self.presenter.film.comment = commentTextView.text
-        self.presenter.film.rating = Int16(cosmosRatingView.rating)
-        self.presenter.tapSave()
-    }
-    
-    @objc func switchValueDidChange(_ sender: UISwitch!) {
-        if (sender.isOn){
-            cosmosRatingView.isHidden = false
-        }
-        else{
-            cosmosRatingView.isHidden = true
-        }
-    }
-    
-    // MARK: - Constraints
     private func setConstraints() {
-        
         view.addSubview(filmLogo)
         view.addSubview(filmNameLabel)
         view.addSubview(yearsLabel)
@@ -141,9 +115,7 @@ class DetailViewController: UIViewController {
         view.addSubview(commentTextView)
         view.addSubview(cosmosRatingView)
         
-        
         let navBarHeight = self.navigationController?.navigationBar.frame.size.height
-        
         
         NSLayoutConstraint.activate([
             filmLogo.centerXAnchor.constraint(equalTo: view.centerXAnchor),
@@ -187,30 +159,57 @@ class DetailViewController: UIViewController {
             cosmosRatingView.bottomAnchor.constraint(equalTo: commentTextView.topAnchor, constant: -4)
         ])
     }
+    
+    // MARK: - Keyboard notification
+    @objc func keyboardWillShow(notification: NSNotification) {
+        if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
+            if view.frame.origin.y == 0 {
+                view.frame.origin.y -= keyboardSize.height
+            }
+        }
+    }
+    
+    @objc func keyboardWillHide(notification: NSNotification) {
+        if view.frame.origin.y != 0 {
+            view.frame.origin.y = 0
+        }
+    }
+    
+    @objc func dismissKeyboard() {
+        view.endEditing(true)
+    }
+    
+    // MARK: - target
+    @objc func saveButton() {        
+        presenter.tapSave(watched: watchedSwith.isOn,
+                          comment: commentTextView.text,
+                          rating: cosmosRatingView.rating)
+    }
+    
+    @objc func switchValueDidChange(_ sender: UISwitch!) {
+        if sender.isOn {
+            cosmosRatingView.isHidden = false
+        } else {
+            cosmosRatingView.isHidden = true
+        }
+    }
 }
 
-// MARK: - Setup film
+// MARK: - DetailViewProtocol
 extension DetailViewController: DetailViewProtocol {
-    func setFilm(film: MyMovie) {
-        if film.watched != true {
+    func setMovie(_ model: ViewModel) {
+        watchedSwith.isOn = model.watched
+        filmNameLabel.text = model.name
+        cosmosRatingView.rating = model.rating
+        yearsLabel.text = model.year // "\(model.year!) year"
+        commentTextView.text = model.comment
+        
+        if model.watched != true {
             cosmosRatingView.isHidden = true
         }
         
-        self.watchedSwith.isOn = film.watched
-        self.filmNameLabel.text = film.name
-        self.cosmosRatingView.rating = Double(film.rating)
-        
-        if film.year != nil {
-            self.yearsLabel.text = "\(film.year!) year"
-        }
-        
-        if let comment = film.comment  {
-            self.commentTextView.text = comment
-        }
-        
-        if film.imageData != nil {
-            let image = UIImage(data: film.imageData!)
-            self.filmLogo.image = image
+        if let img = model.imageData {
+            filmLogo.image = UIImage(data: img)
         }
     }
 }
