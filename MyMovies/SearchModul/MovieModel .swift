@@ -5,16 +5,40 @@
 //  Created by Данила on 14.05.2022.
 //
 
-import Foundation
 import UIKit
 
 struct MoviesModel: Decodable, Equatable {
-    var Search: [Movie]
+    var search: [Movie]
+    
+    enum CodingKeys: String, CodingKey {
+        case search = "Search"
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.search = try container.decode([Movie].self, forKey: .search)
+    }
 }
 
 struct Movie: Decodable, Equatable {
-    var Title: String
-    var Year: String
+    var title: String
+    var year: String
     var imdbID: String
-    var Poster: String
+    var poster: String
+    var imageData: Data?
+    
+    enum CodingKeys: String, CodingKey {
+        case title = "Title"
+        case year = "Year"
+        case imdbID = "imdbID"
+        case poster = "Poster"
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.title = try container.decode(String.self, forKey: .title)
+        self.year = try container.decode(String.self, forKey: .year)
+        self.imdbID = try container.decode(String.self, forKey: .imdbID)
+        self.poster = try container.decode(String.self, forKey: .poster)
+    }
 }

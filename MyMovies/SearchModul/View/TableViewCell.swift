@@ -58,7 +58,6 @@ final class TableViewCell: UITableViewCell {
         contentView.addSubview(filmLogo)
         contentView.addSubview(filmNameLabel)
         contentView.addSubview(yearsLabel)
-
     }
     
     private func setConstraints() {
@@ -91,5 +90,9 @@ final class TableViewCell: UITableViewCell {
     func configureFilmCell(_ model: TableCellModel) {
         filmNameLabel.text = model.name
         yearsLabel.text = model.year
+        
+        if let img = model.image {
+            setImage(img)
+        }
     }
 }

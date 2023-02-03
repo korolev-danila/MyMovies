@@ -31,7 +31,6 @@
 		83990362283287B300538793 /* TableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83990361283287B200538793 /* TableViewCell.swift */; };
 		839903642833AD6F00538793 /* DetailPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 839903632833AD6F00538793 /* DetailPresenter.swift */; };
 		839903672833ADA800538793 /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 839903662833ADA800538793 /* DetailViewController.swift */; };
-		8399036A2833AF8000538793 /* FilmModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 839903692833AF8000538793 /* FilmModel.swift */; };
 		83B9604B298AD0FF007066CC /* Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83B9604A298AD0FF007066CC /* Extension.swift */; };
 /* End PBXBuildFile section */
 
@@ -82,7 +81,6 @@
 		83990361283287B200538793 /* TableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewCell.swift; sourceTree = "<group>"; };
 		839903632833AD6F00538793 /* DetailPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailPresenter.swift; sourceTree = "<group>"; };
 		839903662833ADA800538793 /* DetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; };
-		839903692833AF8000538793 /* FilmModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilmModel.swift; sourceTree = "<group>"; };
 		83B9604A298AD0FF007066CC /* Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extension.swift; sourceTree = "<group>"; };
 		993EE2EDF92AB9F5637BFF2D /* Pods_MyMovies.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MyMovies.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9B9DA01A6564568C1D2D1E24 /* Pods-MyMovies-MyMoviesUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MyMovies-MyMoviesUITests.release.xcconfig"; path = "Target Support Files/Pods-MyMovies-MyMoviesUITests/Pods-MyMovies-MyMoviesUITests.release.xcconfig"; sourceTree = "<group>"; };
@@ -228,7 +226,6 @@
 			children = (
 				839903632833AD6F00538793 /* DetailPresenter.swift */,
 				839903662833ADA800538793 /* DetailViewController.swift */,
-				839903692833AF8000538793 /* FilmModel.swift */,
 			);
 			path = DetailModul;
 			sourceTree = "<group>";
@@ -507,7 +504,6 @@
 				83990353283116FD00538793 /* MovieModel .swift in Sources */,
 				83421B172855013C0069A824 /* CollectionViewCell.swift in Sources */,
 				839903152831168300538793 /* AppDelegate.swift in Sources */,
-				8399036A2833AF8000538793 /* FilmModel.swift in Sources */,
 				839903582831172300538793 /* Router.swift in Sources */,
 				8399034D283116E500538793 /* MainPresenter.swift in Sources */,
 				839903642833AD6F00538793 /* DetailPresenter.swift in Sources */,

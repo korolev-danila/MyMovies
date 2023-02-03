@@ -10,6 +10,7 @@ import UIKit
 protocol SearchViewProtocol: AnyObject {
     func alertOk(title: String, message: String)
     func reloadTable()
+    func reloadCell(_ index: IndexPath)
 }
 
 final class SearchTableVC: UIViewController {
@@ -87,7 +88,6 @@ extension SearchTableVC: UITableViewDelegate, UITableViewDataSource {
 // MARK: - Search Delegate
 extension SearchTableVC: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        
         let text = searchText.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)
         
         if text != "" {
@@ -111,5 +111,9 @@ extension SearchTableVC: SearchViewProtocol {
     
     func reloadTable() {
         myTableView.reloadData()
+    }
+    
+    func reloadCell(_ index: IndexPath) {
+        myTableView.reloadRows(at: [index], with: .none)
     }
 }

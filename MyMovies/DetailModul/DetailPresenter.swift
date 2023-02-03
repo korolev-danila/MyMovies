@@ -43,9 +43,10 @@ final class DetailPresenter {
 // MARK: - DetailPresenterProtocol
 extension DetailPresenter: DetailPresenterProtocol {
     func getMovie() {
-        let model = ViewModel(watched: movie.watched, name: movie.name ?? "",
+        var model = ViewModel(watched: movie.watched, name: movie.name ?? "",
                               year: movie.year ?? "", rating: movie.rating,
                               comment: movie.comment ?? "")
+        model.year += " year"
         view?.setMovie(model)
     }
     

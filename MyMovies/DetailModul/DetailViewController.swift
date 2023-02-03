@@ -201,7 +201,7 @@ extension DetailViewController: DetailViewProtocol {
         watchedSwith.isOn = model.watched
         filmNameLabel.text = model.name
         cosmosRatingView.rating = model.rating
-        yearsLabel.text = model.year // "\(model.year!) year"
+        yearsLabel.text = model.year
         commentTextView.text = model.comment
         
         if model.watched != true {

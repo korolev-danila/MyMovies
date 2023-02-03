@@ -5,7 +5,6 @@
 //  Created by Данила on 14.05.2022.
 //
 
-import Foundation
 import CoreData
 
 protocol SearchPresenterProtocol: AnyObject {
@@ -18,6 +17,7 @@ protocol SearchPresenterProtocol: AnyObject {
 struct TableCellModel {
     var name: String
     var year: String
+    var image: Data?
 }
 
 final class SearchPresenter {
@@ -25,8 +25,7 @@ final class SearchPresenter {
     private let router: RouterProtocol
     private let context: NSManagedObjectContext
     
-    var films = [Film]()
-    var movies = [Movie]()    
+    var movies = [Movie]()
     
     // MARK: - Initialize Method
     init(router: RouterProtocol, context: NSManagedObjectContext) {
@@ -47,18 +46,7 @@ extension SearchPresenter: SearchPresenterProtocol {
             guard let searchMovies = moviesModel else { return }
             
             if error == nil {
-                self?.movies = searchMovies.Search
-//                self?.films.removeAll()
-//
-//                self?.movies.forEach({ movie in
-//                    var film = Film()
-//                    film.name = movie.Title
-//                    film.year = movie.Year
-//                    film.imdbID = movie.imdbID
-//                    film.imageStr = movie.Poster
-//
-//                    self?.films.append(film)
-//                })
+                self?.movies = searchMovies.search
                 self?.view?.reloadTable()
             } else {
                 self?.view?.alertOk(title: "Error", message: "Film not found")
@@ -67,16 +55,15 @@ extension SearchPresenter: SearchPresenterProtocol {
     }
     
     func showDetail(index: IndexPath) {
-        guard let entity = NSEntityDescription.entity(forEntityName: "MyMovie", in: context) else { return }
+        guard let entity = NSEntityDescription.entity(forEntityName: "MyMovie", in: context),
+              let movie = movies[safe: index.row] else { return }
         
         let filmObject = MyMovie(entity: entity, insertInto: context)
-//        filmObject.name = films[index].name
-//        filmObject.year = films[index].year
-//        filmObject.imdbID = films[index].imdbID
-//        filmObject.rating = Int16(films[index].rating)
-//        filmObject.imageData = films[index].imageData
-//        filmObject.watched = films[index].watched
-//        filmObject.comment = films[index].comment
+        
+        filmObject.name = movie.title
+        filmObject.year = movie.year
+        filmObject.imdbID = movie.imdbID
+        filmObject.imageData = movie.imageData
         
         router.showDetailModul(movie: filmObject)
     }
@@ -86,30 +73,31 @@ extension SearchPresenter: SearchPresenterProtocol {
     }
     
     func getTableModel(index: IndexPath) -> TableCellModel {
+        let movie = movies[safe: index.row]
+        var model = TableCellModel(name: movie?.title ?? "", year: "")
         
-        var movie = movies[safe: index.row]
-        var model = TableCellModel(name: movie?.Title ?? "", year: "")
-        
-        if let year = movie?.Year {
+        if let year = movie?.year {
             model.year = "\(year) year"
         }
         
-        if let urlString = movie?.Poster {
-            NetworkRequest.shared.requestDataPoster(urlString: urlString) { [weak self] result in
-                switch result {
-                case .success(let data):
-//                    self?.presenter.films[indexPath.row].imageData = data
-//                    cell.setImage(imageData: data)
-                    print("No")
-                case .failure(let error):
-//                    let filmLogo = UIImage(named: "filmLogo")?.pngData()
-//                    self?.presenter.films[indexPath.row].imageData = filmLogo
-//                    cell.setImage(imageData: filmLogo!)
-                    print("No film logo" + error.localizedDescription)
+        if movie?.imageData == nil {
+            if let urlString = movie?.poster {
+                NetworkRequest.shared.requestDataPoster(urlString: urlString) { [weak self] result in
+                    switch result {
+                    case .success(let data):
+                        if self?.movies[safe: index.row] != nil {
+                            self?.movies[index.row].imageData = data
+                            self?.view?.reloadCell(index)
+                        }
+                    case .failure(let error):
+                        print("No film logo" + error.localizedDescription)
+                    }
                 }
             }
+        } else {
+            model.image = movie?.imageData
         }
-        return model 
+        return model
     }
 }
 
