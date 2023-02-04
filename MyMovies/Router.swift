@@ -18,12 +18,12 @@ protocol RouterProtocol {
 final class Router {
     private let navigationController: UINavigationController
     private let modulBuilder: ModulBuilderProtocol
-    private let context: NSManagedObjectContext
+    private let coreData: CoreDataProtocol
     
-    init(navigationController: UINavigationController, modulBuilder: ModulBuilderProtocol, context: NSManagedObjectContext) {
+    init(navigationController: UINavigationController, modulBuilder: ModulBuilderProtocol, coreData: CoreDataProtocol) {
         self.navigationController = navigationController
         self.modulBuilder = modulBuilder
-        self.context = context
+        self.coreData = coreData
     }
 }
 
@@ -31,18 +31,18 @@ extension Router: RouterProtocol {
     
     public func showMainModul() {
         let mainViewController =  modulBuilder.createMainModule(router: self,
-                                                                context: context)
+                                                                coreData: coreData)
         navigationController.viewControllers = [mainViewController]
     }
     
     public func showSearchModul() {
         let searchVC = modulBuilder.createSearchModule(router: self,
-                                                       context: context)
+                                                       coreData: coreData)
         navigationController.pushViewController(searchVC, animated: true)
     }
     
     public func showDetailModul(movie: MyMovie) {
-        let detailViewController =  modulBuilder.createDetailModule(router: self , movie: movie, context: context)
+        let detailViewController =  modulBuilder.createDetailModule(router: self , movie: movie, coreData: coreData)
         navigationController.pushViewController(detailViewController, animated: true)
     }
     

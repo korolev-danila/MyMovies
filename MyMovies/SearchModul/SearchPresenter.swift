@@ -5,7 +5,7 @@
 //  Created by Данила on 14.05.2022.
 //
 
-import CoreData
+import Foundation
 
 protocol SearchPresenterProtocol: AnyObject {
     func searchFilm(_ filmName: String)
@@ -23,14 +23,14 @@ struct TableCellModel {
 final class SearchPresenter {
     weak var view: SearchViewProtocol?
     private let router: RouterProtocol
-    private let context: NSManagedObjectContext
+    private let coreData: CoreDataProtocol
     
     var movies = [Movie]()
     
     // MARK: - Initialize Method
-    init(router: RouterProtocol, context: NSManagedObjectContext) {
+    init(router: RouterProtocol, coreData: CoreDataProtocol) {
         self.router = router
-        self.context = context
+        self.coreData = coreData
     }
     
     required init?(coder: NSCoder) {
@@ -55,17 +55,16 @@ extension SearchPresenter: SearchPresenterProtocol {
     }
     
     func showDetail(index: IndexPath) {
-        guard let entity = NSEntityDescription.entity(forEntityName: "MyMovie", in: context),
-              let movie = movies[safe: index.row] else { return }
+        guard let movie = movies[safe: index.row] else { return }
         
-        let filmObject = MyMovie(entity: entity, insertInto: context)
-        
-        filmObject.name = movie.title
-        filmObject.year = movie.year
-        filmObject.imdbID = movie.imdbID
-        filmObject.imageData = movie.imageData
-        
-        router.showDetailModul(movie: filmObject)
+        if let filmObject = coreData.createMovie() {
+            filmObject.name = movie.title
+            filmObject.year = movie.year
+            filmObject.imdbID = movie.imdbID
+            filmObject.imageData = movie.imageData
+            
+            router.showDetailModul(movie: filmObject)
+        }
     }
     
     func getCountOfMovie() -> Int {

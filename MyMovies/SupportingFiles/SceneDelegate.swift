@@ -21,7 +21,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         let modulBuilder = ModulBuilder()
         let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-        let router = Router(navigationController: navigationController, modulBuilder: modulBuilder, context: context)
+        let coreData = CoreDataManager(context: context)
+        let router = Router(navigationController: navigationController, modulBuilder: modulBuilder, coreData: coreData)
         
         router.showMainModul()
         

@@ -8,7 +8,6 @@
 import Foundation
 
 class NetworkRequest {
-    
     static let shared = NetworkRequest()
     
     private init() {}
@@ -18,15 +17,13 @@ class NetworkRequest {
     func requestData(searchName: String, completion: @escaping (Result<Data, Error>) -> Void) {
         
         let sN = searchName
-        
         let urlStr = "http://omdbapi.com/?apikey=\(apiKey)&s=" + sN
-        
         
         guard let url = URL(string: urlStr ) else { return }
         
-        print("requestData !")
         URLSession.shared.dataTask(with: url) { data, responce, error in
             DispatchQueue.main.async {
+                
                 if let error = error {
                     completion(.failure(error))
                     return
@@ -40,11 +37,11 @@ class NetworkRequest {
     }
     
     func requestDataPoster(urlString: String, completion: @escaping (Result<Data, Error>) -> Void) {
-        
         guard let url = URL(string: urlString ) else { return }
         
         URLSession.shared.dataTask(with: url) { data, responce, error in
             DispatchQueue.main.async {
+                
                 if let error = error {
                     completion(.failure(error))
                     return

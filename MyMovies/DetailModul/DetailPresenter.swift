@@ -5,7 +5,7 @@
 //  Created by Данила on 17.05.2022.
 //
 
-import CoreData
+import Foundation
 
 protocol DetailPresenterProtocol: AnyObject {
     func getMovie()
@@ -24,14 +24,14 @@ struct ViewModel {
 final class DetailPresenter {
     weak var view: DetailViewProtocol?
     private let router: RouterProtocol
-    private let context: NSManagedObjectContext
+    private let coreData: CoreDataProtocol
     
     private var movie: MyMovie
     
     // MARK: - Initialize Method
-    init(router: RouterProtocol, context: NSManagedObjectContext, movie: MyMovie) {
+    init(router: RouterProtocol, coreData: CoreDataProtocol, movie: MyMovie) {
         self.router = router
-        self.context = context
+        self.coreData = coreData
         self.movie = movie
     }
     
@@ -55,12 +55,8 @@ extension DetailPresenter: DetailPresenterProtocol {
         movie.comment = comment
         movie.rating = rating
         
-        do {
-            try context.save()
-            print("save context")
-        } catch let error as NSError {
-            print(error.localizedDescription)
-        }
+        coreData.save()
+        
         router.popToRoot()
     }
 }

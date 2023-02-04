@@ -5,7 +5,7 @@
 //  Created by Данила on 14.05.2022.
 //
 
-import CoreData
+import Foundation
 
 protocol MainPresenterProtocol: AnyObject {
     func showSearch()
@@ -25,14 +25,14 @@ struct CellModel {
 final class MainPresenter {
     weak var view: MainViewProtocol?
     private let router: RouterProtocol
-    private let context: NSManagedObjectContext
+    private let coreData: CoreDataProtocol
     
     private var myMovies: [MyMovie] = []
     
     // MARK: - Initialize Method
-    init(router: RouterProtocol, context: NSManagedObjectContext) {
+    init(router: RouterProtocol, coreData: CoreDataProtocol) {
         self.router = router
-        self.context = context
+        self.coreData = coreData
     }
     
     required init?(coder: NSCoder) {
@@ -54,7 +54,7 @@ extension MainPresenter: MainPresenterProtocol {
     
     func delete(index: IndexPath) {
         if let movie = myMovies[safe: index.row] {
-            context.delete(movie)
+            coreData.delete(movie)
         }
     }
     
@@ -70,14 +70,7 @@ extension MainPresenter: MainPresenterProtocol {
     }
     
     func fetchMovies() {
-        let fetchRequest: NSFetchRequest<MyMovie> = MyMovie.fetchRequest()
-        
-        do {
-            myMovies = try context.fetch(fetchRequest)
-            print("presenter.myMovies reloaddata")
-            view?.reloadData()
-        } catch let error as NSError {
-            print(error.localizedDescription)
-        }
+        myMovies = coreData.fetchMovies()
+        view?.reloadData()
     }
 }
