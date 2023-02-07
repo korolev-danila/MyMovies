@@ -12,7 +12,7 @@ class NetworkRequest {
     
     private init() {}
     
-    let apiKey = "********"
+    let apiKey = "38b91a6" //  https://www.omdbapi.com/apikey.aspx
     
     func requestData(searchName: String, completion: @escaping (Result<Data, Error>) -> Void) {
         

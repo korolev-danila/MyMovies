@@ -5,7 +5,7 @@
 //  Created by Данила on 14.05.2022.
 //
 
-import UIKit
+import Foundation
 
 struct MoviesModel: Decodable, Equatable {
     var search: [Movie]

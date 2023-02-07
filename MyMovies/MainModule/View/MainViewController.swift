@@ -16,12 +16,7 @@ final class MainViewController: UIViewController {
     
     private var didSelectItemAtIsEnabled = true
     
-    private var myCollectionView: UICollectionView = {
-        let collection = UICollectionView()
-        collection.register(CollectionViewCell.self, forCellWithReuseIdentifier: "MyCell")
-        collection.backgroundColor = .black
-        return collection
-    }()
+    private lazy var myCollectionView = UICollectionView()
     
     // MARK: - Initialize Method
     init(presenter: MainPresenterProtocol) {
@@ -47,9 +42,10 @@ final class MainViewController: UIViewController {
         let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
         layout.sectionInset = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
         layout.itemSize = CGSize(width: 90, height: 130)
-        
-        myCollectionView.frame = view.frame
-        myCollectionView.setCollectionViewLayout(layout, animated: false)
+
+        myCollectionView = UICollectionView(frame: view.frame, collectionViewLayout: layout)
+        myCollectionView.register(CollectionViewCell.self, forCellWithReuseIdentifier: "MyCell")
+        myCollectionView.backgroundColor = .black
         
         myCollectionView.delegate = self
         myCollectionView.dataSource = self

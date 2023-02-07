@@ -11,7 +11,7 @@ protocol CollectionViewCellDelegate: AnyObject {
     func delete(cell: CollectionViewCell)
 }
 
-class CollectionViewCell: UICollectionViewCell {
+final class CollectionViewCell: UICollectionViewCell {
     
     weak var delegate: CollectionViewCellDelegate?
     
@@ -119,10 +119,9 @@ class CollectionViewCell: UICollectionViewCell {
         delegate?.delete(cell: self)
     }
     
-    // MARK: - Public method 
-    public func configureMovieCell(cellModel: CellModel) {
+    func configureMovieCell(cellModel: CellModel) {
         
-        if let data = cellModel.imageData{
+        if let data = cellModel.imageData {
             filmLogo.image = UIImage(data: data)
         } else {
             filmLogo.image = nil
