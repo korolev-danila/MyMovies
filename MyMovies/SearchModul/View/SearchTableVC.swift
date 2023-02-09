@@ -33,7 +33,7 @@ final class SearchTableVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.backgroundColor = .black
+        view.backgroundColor = .systemBackground
         
         settingTableView()
         settingNC()
@@ -49,8 +49,8 @@ final class SearchTableVC: UIViewController {
         myTableView.register(TableViewCell.self, forCellReuseIdentifier: "MyCell")
         myTableView.dataSource = self
         myTableView.delegate = self
-        myTableView.rowHeight = 144.0
-        myTableView.backgroundColor = .black
+        myTableView.rowHeight = 164.0
+        myTableView.backgroundColor = .systemBackground
         
         view.addSubview(myTableView)
     }
@@ -94,7 +94,7 @@ extension SearchTableVC: UISearchBarDelegate {
             timer.invalidate()
             timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false, block: { [weak self] _ in
                 let filmName = text!.replacingOccurrences(of: " ", with: "%20")
-                self?.presenter.searchFilm(filmName) // "harry%20potter"
+                self?.presenter.searchFilm(filmName)
             })
         }
     }

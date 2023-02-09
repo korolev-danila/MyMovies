@@ -25,7 +25,7 @@ final class CollectionViewCell: UICollectionViewCell {
     
     private let filmLogo: UIImageView = {
         let imageView = UIImageView()
-        imageView.backgroundColor = .green
+        imageView.backgroundColor = .clear
         imageView.clipsToBounds = true
         imageView.contentMode = .scaleAspectFill
         imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -36,7 +36,6 @@ final class CollectionViewCell: UICollectionViewCell {
         let label = UILabel()
         label.text = "Name film"
         label.font = UIFont.systemFont(ofSize: 14)
-        label.textColor = .white
         label.adjustsFontSizeToFitWidth = false
         label.numberOfLines = 2
         label.baselineAdjustment = .alignBaselines
@@ -56,7 +55,7 @@ final class CollectionViewCell: UICollectionViewCell {
     private let closeButton: UIButton = {
         let button = UIButton()
         button.setImage(UIImage(systemName: "xmark.circle"), for: .normal )
-        button.tintColor = .white
+        button.tintColor = .lightGray
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()

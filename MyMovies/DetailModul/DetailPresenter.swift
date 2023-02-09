@@ -47,6 +47,7 @@ extension DetailPresenter: DetailPresenterProtocol {
                               year: movie.year ?? "", rating: movie.rating,
                               comment: movie.comment ?? "")
         model.year += " year"
+        model.imageData = movie.imageData
         view?.setMovie(model)
     }
     

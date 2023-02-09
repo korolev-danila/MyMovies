@@ -35,17 +35,21 @@ final class MainViewController: UIViewController {
         presenter.fetchMovies()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        presenter.fetchMovies()
+    }
+    
     // MARK: - Private Method
     private func setupView() {
-        view.backgroundColor = .black
+        view.backgroundColor = .systemBackground
         
         let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
         layout.sectionInset = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
-        layout.itemSize = CGSize(width: 90, height: 130)
+        layout.itemSize = CGSize(width: 90, height: 140)
 
         myCollectionView = UICollectionView(frame: view.frame, collectionViewLayout: layout)
         myCollectionView.register(CollectionViewCell.self, forCellWithReuseIdentifier: "MyCell")
-        myCollectionView.backgroundColor = .black
+        myCollectionView.backgroundColor = .systemBackground
         
         myCollectionView.delegate = self
         myCollectionView.dataSource = self
@@ -54,14 +58,14 @@ final class MainViewController: UIViewController {
     }
     
     private func settingNC() {
-        navigationController?.navigationBar.backgroundColor = .blue
+        navigationController?.navigationBar.backgroundColor = .systemBlue
         
         let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(setAdd))
-        addButton.tintColor = .white
+        addButton.tintColor = .label
         navigationController?.navigationBar.topItem?.setRightBarButton(addButton, animated: true)
         
         let editButton = UIBarButtonItem(barButtonSystemItem: .edit, target: self, action: #selector(setEdit))
-        editButton.tintColor = .white
+        editButton.tintColor = .label
         navigationController?.navigationBar.topItem?.setLeftBarButton(editButton, animated: true)
     }
     

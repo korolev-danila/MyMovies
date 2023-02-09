@@ -92,7 +92,6 @@ final class DetailViewController: UIViewController {
         
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
-        // self.hideKeyboardWhenTappedAround()
         let tap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         view.addGestureRecognizer(tap)
         
@@ -101,12 +100,21 @@ final class DetailViewController: UIViewController {
     
     // MARK: - Private method
     private func settingNC() {
-        let saveButton = UIBarButtonItem(title: "Save", style: .plain , target: self, action: #selector(saveButton))
-        saveButton.tintColor = .white
-        self.navigationItem.setRightBarButton(saveButton, animated: true)
+        navigationController?.interactivePopGestureRecognizer?.delegate = self
+
+        let saveButton = UIBarButtonItem(title: "Save", style: .plain, target: self, action: #selector(saveButton))
+        saveButton.tintColor = .label
+        navigationItem.setRightBarButton(saveButton, animated: true)
+        let backButton = UIBarButtonItem(title: "back", style: .plain, target: self, action: #selector(cancelButton))
+        let img = UIImage(systemName: "chevron.backward")
+        backButton.image = img
+        
+        backButton.tintColor = .label
+        navigationItem.setLeftBarButton(backButton, animated: true)
     }
     
     private func setConstraints() {
+        view.backgroundColor = .systemBackground
         view.addSubview(filmLogo)
         view.addSubview(filmNameLabel)
         view.addSubview(yearsLabel)
@@ -119,8 +127,8 @@ final class DetailViewController: UIViewController {
         
         NSLayoutConstraint.activate([
             filmLogo.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            filmLogo.topAnchor.constraint(equalTo: view.topAnchor, constant: (navBarHeight ?? 0) + 24),
-            filmLogo.heightAnchor.constraint(equalToConstant: 164),
+            filmLogo.topAnchor.constraint(equalTo: view.topAnchor, constant: (navBarHeight ?? 0) + 64),
+            filmLogo.heightAnchor.constraint(equalToConstant: 184),
             filmLogo.widthAnchor.constraint(equalToConstant: 164)
         ])
         
@@ -180,10 +188,14 @@ final class DetailViewController: UIViewController {
     }
     
     // MARK: - target
-    @objc func saveButton() {        
+    @objc func saveButton() {
         presenter.tapSave(watched: watchedSwith.isOn,
                           comment: commentTextView.text,
                           rating: cosmosRatingView.rating)
+    }
+    
+    @objc func cancelButton() {
+        navigationController?.popViewController(animated: true)
     }
     
     @objc func switchValueDidChange(_ sender: UISwitch!) {
@@ -211,5 +223,12 @@ extension DetailViewController: DetailViewProtocol {
         if let img = model.imageData {
             filmLogo.image = UIImage(data: img)
         }
+    }
+}
+
+// MARK: - UIGestureRecognizerDelegate
+extension DetailViewController: UIGestureRecognizerDelegate {
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldBeRequiredToFailBy otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        return true
     }
 }
