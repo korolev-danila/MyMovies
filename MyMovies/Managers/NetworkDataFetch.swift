@@ -18,10 +18,6 @@ class NetworkDataFetch {
             switch result {
             case .success(let data):
                 do {
-                    print(data)
-                    let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String : Any]
-                    print(json)
-                    
                     let movies = try JSONDecoder().decode(MoviesModel.self, from: data)
                     responce(movies, nil)
                 } catch let jsonError {
